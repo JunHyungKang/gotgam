@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+@theme {
+  --color-gotgam-orange: #E86A33;
+  --color-gotgam-brown: #573C29;
+  --color-gotgam-gold: #D4AF37;
+  --color-gotgam-cream: #FDF8F2;
+}
+
+body {
+  background-color: var(--color-gotgam-cream);
+  color: var(--color-gotgam-brown);
+}
