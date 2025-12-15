@@ -17,13 +17,13 @@ export default function Footer() {
                     </Link>
                 </div>
 
-                <div className="flex justify-center items-center gap-4 mt-8 opacity-50 text-xs">
-                    <p>
+                <div className="flex justify-center items-center gap-4 mt-8 text-xs">
+                    <p className="opacity-50">
                         &copy; {new Date().getFullYear()} Yeongdong Gotgam. All rights reserved.
                     </p>
-                    <span className="w-px h-3 bg-gotgam-cream/50"></span>
-                    <Link href="/admin" className="hover:text-gotgam-orange transition-colors">
-                        Admin
+                    <span className="w-px h-3 bg-gotgam-cream/30"></span>
+                    <Link href="/admin" className="text-gotgam-cream/70 hover:text-white hover:underline transition-all font-medium">
+                        관리자 홈
                     </Link>
                 </div>
             </div>
