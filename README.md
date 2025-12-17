@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 영동곧감 주문 사이트 (Yeongdong Gotgam Order Site)
 
-## Getting Started
+영동 명품 곶감 주문 및 관리를 위한 웹 애플리케이션입니다.
 
-First, run the development server:
+## 주요 기능 (Key Features)
 
+### 1. 주문하기 (User)
+- **복수 상품 주문**: '30구(대과)', '35구(실속형)' 등 여러 상품을 수량별로 한 번에 주문할 수 있습니다.
+- **주소 검색**: 카카오(Daum) 우편번호 서비스를 연동하여 정확한 주소를 간편하게 입력할 수 있습니다.
+- **자동 계산**: 선택한 상품 수량에 따라 총 결제 금액을 실시간으로 확인하고, 주문 완료 시 입금해야 할 총액을 안내받습니다.
+- **편의 기능**:
+  - '보내는 분과 동일' 체크박스로 정보 자동 입력
+  - 연락처 자동 포맷팅 (010-xxxx-xxxx)
+
+### 2. 주문 조회 (User)
+- **비회원 조회**: 주문자명과 연락처로 본인의 주문 내역(입금 대기/완료 상태 등)을 간편하게 조회할 수 있습니다.
+- **입금 계좌 안내**: 입금해야 할 계좌 정보와 금액 합계를 팝업으로 안내합니다.
+
+### 3. 관리자 대시보드 (Admin)
+- **주문 관리**: 전체 주문 현황을 테이블 형태로 확인하고, 상태(접수/입금확인/발송완료)를 변경할 수 있습니다.
+- **휴지통 (Recycle Bin)**:
+  - 주문 취소/삭제 시 '휴지통'으로 이동하여 실수로 인한 데이터 유실을 방지합니다.
+  - 휴지통에서 다시 '복구'하거나 '영구 삭제'할 수 있습니다.
+- **직관적인 UI**: 긴 주소도 잘림 없이 전체 내용을 확인할 수 있도록 개선되었습니다.
+
+## 기술 스택 (Tech Stack)
+- **Framework**: Next.js 14 (App Router)
+- **Database**: Supabase (PostgreSQL)
+- **Styling**: TailwindCSS
+- **Utils**: react-daum-postcode
+
+## 시작하기 (Getting Started)
+
+1. 의존성 설치:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. 개발 서버 실행:
+```bash
+npm run dev
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+3. 브라우저에서 `http://localhost:3000` 접속

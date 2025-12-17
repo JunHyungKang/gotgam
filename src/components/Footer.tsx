@@ -10,7 +10,7 @@ export default function Footer() {
 
                 <div className="border-t border-gotgam-cream/20 pt-6">
                     <p className="text-sm opacity-80 mb-2">무통장 입금 계좌 안내</p>
-                    <p className="text-lg font-bold mb-4">농협 000-0000-0000-00 (예금주: 홍길동)</p>
+                    <p className="text-lg font-bold mb-4">우리은행 1002-857-852325 (예금주: 홍주희)</p>
 
                     <Link href="/check" className="text-sm text-gotgam-orange hover:text-orange-400 underline decoration-gotgam-orange/50 underline-offset-4">
                         주문 내역 조회하기
