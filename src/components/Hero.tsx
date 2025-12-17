@@ -2,8 +2,36 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
+import { useState, useEffect } from 'react'
+
+const productImages = [
+    {
+        src: "/images/uploaded_image_3_1765804097961.jpg",
+        title: "명품 세트 30구 / 35구",
+        desc: "40,000원 ~"
+    },
+    {
+        src: "/images/uploaded_image_0_1765804097961.jpg",
+        title: "프리미엄 선물세트",
+        desc: "최상의 품질"
+    },
+    {
+        src: "/images/uploaded_image_1_1765804097961.jpg",
+        title: "실속형 가정용",
+        desc: "달콤한 간식"
+    }
+]
 
 export default function Hero() {
+    const [currentSlide, setCurrentSlide] = useState(0)
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentSlide((prev) => (prev + 1) % productImages.length)
+        }, 4000)
+        return () => clearInterval(timer)
+    }, [])
+
     const scrollToOrder = () => {
         const orderSection = document.getElementById('order-form')
         if (orderSection) {
@@ -65,21 +93,39 @@ export default function Hero() {
                     </div>
                 </div>
 
-                {/* Right: Product Image Card (Visibility) */}
-                <div className="flex-1 w-full max-w-md md:max-w-lg relative animate-fade-in-up delay-200 hidden md:block">
-                    <div className="relative aspect-square rounded-3xl overflow-hidden shadow-2xl border border-white/10 ring-1 ring-white/20 transform rotate-2 hover:rotate-0 transition-transform duration-500">
-                        <Image
-                            src="/images/uploaded_image_3_1765804097961.jpg"
-                            alt="영동 곶감 선물세트"
-                            fill
-                            className="object-cover"
-                            sizes="(max-width: 768px) 100vw, 50vw"
-                        />
-                        {/* Glass Badge */}
-                        <div className="absolute bottom-6 left-6 right-6 bg-black/40 backdrop-blur-md p-4 rounded-xl border border-white/10 text-white">
-                            <p className="font-serif text-lg">명품 세트 30구 / 35구</p>
-                            <p className="text-sm text-gray-300">40,000원 ~</p>
-                        </div>
+                {/* Right: Product Image Carousel */}
+                <div className="flex-1 w-full max-w-md md:max-w-lg relative animate-fade-in-up delay-200 hidden md:block group">
+                    <div className="relative aspect-square rounded-3xl overflow-hidden shadow-2xl border border-white/10 ring-1 ring-white/20 transform rotate-2 group-hover:rotate-0 transition-transform duration-500">
+                        {productImages.map((img, index) => (
+                            <div 
+                                key={index}
+                                className={`absolute inset-0 transition-opacity duration-1000 ${index === currentSlide ? 'opacity-100' : 'opacity-0'}`}
+                            >
+                                <Image
+                                    src={img.src}
+                                    alt={img.title}
+                                    fill
+                                    className="object-cover"
+                                    sizes="(max-width: 768px) 100vw, 50vw"
+                                />
+                                {/* Glass Badge */}
+                                <div className="absolute bottom-6 left-6 right-6 bg-black/40 backdrop-blur-md p-4 rounded-xl border border-white/10 text-white transform transition-transform duration-500 translate-y-0">
+                                    <p className="font-serif text-lg">{img.title}</p>
+                                    <p className="text-sm text-gray-300">{img.desc}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    {/* Carousel Indicators */}
+                    <div className="absolute -bottom-8 left-0 right-0 flex justify-center gap-2">
+                        {productImages.map((_, index) => (
+                            <button
+                                key={index}
+                                onClick={() => setCurrentSlide(index)}
+                                className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentSlide ? 'bg-gotgam-orange w-6' : 'bg-white/30 hover:bg-white/50'}`}
+                                aria-label={`Go to slide ${index + 1}`}
+                            />
+                        ))}
                     </div>
                     {/* Decorative Elements */}
                     <div className="absolute -z-10 top-10 -right-10 w-full h-full border-2 border-white/20 rounded-3xl" />
