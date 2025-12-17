@@ -1,19 +1,19 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { Suspense, useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import BankAccountModal from '@/components/BankAccountModal'
 
-export default function SuccessPage() {
+function SuccessContent() {
     const [showModal, setShowModal] = useState(true)
     const searchParams = useSearchParams()
     const amount = searchParams.get('amount') ? Number(searchParams.get('amount')) : undefined
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-gotgam-cream p-4">
+        <>
             <BankAccountModal isOpen={showModal} onClose={() => setShowModal(false)} amount={amount} />
-            
+
             <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md text-center border border-gotgam-orange/20">
                 <div className="w-16 h-16 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
                     <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -42,6 +42,16 @@ export default function SuccessPage() {
                     메인으로 돌아가기
                 </Link>
             </div>
+        </>
+    )
+}
+
+export default function SuccessPage() {
+    return (
+        <div className="min-h-screen flex flex-col items-center justify-center bg-gotgam-cream p-4">
+            <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+                <SuccessContent />
+            </Suspense>
         </div>
     )
 }
