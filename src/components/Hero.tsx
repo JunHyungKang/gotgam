@@ -93,29 +93,51 @@ export default function Hero() {
                     </div>
                 </div>
 
-                {/* Right: Product Image Carousel */}
-                <div className="flex-1 w-full max-w-md md:max-w-lg relative animate-fade-in-up delay-200 hidden md:block group">
-                    <div className="relative aspect-square rounded-3xl overflow-hidden shadow-2xl border border-white/10 ring-1 ring-white/20 transform rotate-2 group-hover:rotate-0 transition-transform duration-500">
-                        {productImages.map((img, index) => (
-                            <div 
-                                key={index}
-                                className={`absolute inset-0 transition-opacity duration-1000 ${index === currentSlide ? 'opacity-100' : 'opacity-0'}`}
-                            >
-                                <Image
-                                    src={img.src}
-                                    alt={img.title}
-                                    fill
-                                    className="object-cover"
-                                    sizes="(max-width: 768px) 100vw, 50vw"
-                                />
-                                {/* Glass Badge */}
-                                <div className="absolute bottom-6 left-6 right-6 bg-black/40 backdrop-blur-md p-4 rounded-xl border border-white/10 text-white transform transition-transform duration-500 translate-y-0">
-                                    <p className="font-serif text-lg">{img.title}</p>
-                                    <p className="text-sm text-gray-300">{img.desc}</p>
+                {/* Right: Product Image Carousel (Stacked Cards) */}
+                <div className="flex-1 w-full max-w-md md:max-w-lg relative animate-fade-in-up delay-200 hidden md:block h-[500px] perspective-1000">
+                    <div className="relative w-full h-full flex items-center justify-center">
+                        {productImages.map((img, index) => {
+                            // Calculate position relative to current slide
+                            // 0: Active, 1: Next, 2: Last (in 3 items)
+                            const position = (index - currentSlide + productImages.length) % productImages.length;
+                            
+                            let cardStyle = "";
+                            let zIndex = 0;
+
+                            if (position === 0) { // Active
+                                cardStyle = "scale-100 opacity-100 rotate-0 translate-x-0 translate-y-0 shadow-2xl skew-x-0";
+                                zIndex = 30;
+                            } else if (position === 1) { // Next
+                                cardStyle = "scale-95 opacity-70 rotate-6 translate-x-8 translate-y-4 shadow-xl";
+                                zIndex = 20;
+                            } else { // Last (Upcoming / Previous)
+                                cardStyle = "scale-90 opacity-40 rotate-12 translate-x-16 translate-y-8 shadow-lg";
+                                zIndex = 10;
+                            }
+
+                            return (
+                                <div 
+                                    key={index}
+                                    className={`absolute w-full aspect-square rounded-3xl overflow-hidden border border-white/10 ring-1 ring-white/20 transition-all duration-700 ease-in-out bg-stone-800 ${cardStyle}`}
+                                    style={{ zIndex }}
+                                >
+                                    <Image
+                                        src={img.src}
+                                        alt={img.title}
+                                        fill
+                                        className="object-cover"
+                                        sizes="(max-width: 768px) 100vw, 50vw"
+                                    />
+                                    {/* Glass Badge - Only visible on active card */}
+                                    <div className={`absolute bottom-6 left-6 right-6 bg-black/50 backdrop-blur-md p-4 rounded-xl border border-white/10 text-white transition-opacity duration-300 ${position === 0 ? 'opacity-100' : 'opacity-0'}`}>
+                                        <p className="font-serif text-lg">{img.title}</p>
+                                        <p className="text-sm text-gray-300">{img.desc}</p>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            )
+                        })}
                     </div>
+                    
                     {/* Carousel Indicators */}
                     <div className="absolute -bottom-8 left-0 right-0 flex justify-center gap-2">
                         {productImages.map((_, index) => (
@@ -127,8 +149,6 @@ export default function Hero() {
                             />
                         ))}
                     </div>
-                    {/* Decorative Elements */}
-                    <div className="absolute -z-10 top-10 -right-10 w-full h-full border-2 border-white/20 rounded-3xl" />
                 </div>
             </div>
         </section>
