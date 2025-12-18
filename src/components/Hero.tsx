@@ -40,7 +40,7 @@ export default function Hero() {
     }
 
     return (
-        <section className="relative h-screen min-h-[700px] flex items-center overflow-hidden bg-stone-900">
+        <section className="relative h-screen md:min-h-[700px] flex items-center overflow-hidden bg-stone-900">
             {/* Background: Tree Image (Atmosphere) */}
             <div className="absolute inset-0 z-0">
                 <Image
@@ -57,33 +57,38 @@ export default function Hero() {
             </div>
 
             {/* Content Container */}
-            <div className="container mx-auto px-4 relative z-10 h-full flex flex-col md:flex-row items-center justify-center md:justify-between gap-12 pt-20">
+            <div className="container mx-auto px-4 relative z-10 h-full flex flex-col md:flex-row items-center justify-center md:justify-between gap-8 md:gap-12 pt-0 md:pt-20">
                 
-                {/* Left: Text Content */}
-                <div className="flex-1 text-center md:text-left space-y-8 animate-fade-in-up max-w-2xl">
-                    <div className="space-y-4">
-                        <h1 className="text-5xl md:text-7xl font-bold text-white font-serif drop-shadow-lg leading-tight">
-                            자연이 빚은 <br/>
-                            <span className="text-gotgam-orange">명품 영동 곶감</span>
+                <div className="flex-1 text-center md:text-left space-y-6 md:space-y-8 animate-fade-in-up max-w-2xl w-full flex flex-col items-center md:items-start justify-center">
+                    <div className="space-y-2 md:space-y-4">
+                        <h1 className="text-4xl md:text-7xl text-white drop-shadow-lg leading-tight font-['Noto_Sans_KR'] font-bold">
+                            물한리 자연이 빚은 <br/>
+                            <span className="text-gotgam-orange">명품 곶감</span>
                         </h1>
                     </div>
                     
-                    <p className="text-lg md:text-xl text-gray-200 font-light leading-relaxed">
-                        물한계곡의 청정한 바람과 농부의 정성으로 완성했습니다.<br className="hidden md:block" />
-                        소중한 분께 감사의 마음을 전하세요.
-                    </p>
+                    <div className="space-y-2 text-gray-200 leading-relaxed font-['Noto_Sans_KR']">
+                        <p className="text-base md:text-xl font-medium break-keep">
+                            충북 영동군 물한리 민주지산 자연휴양림 인근 청정 지역에서 <br className="hidden md:block" />
+                            시부모님께서 직접 농사지은 감으로 정성껏 만든 곶감입니다.
+                        </p>
+                        <p className="text-sm md:text-lg font-thin break-keep text-gray-300">
+                            쫀득한 식감과 달콤함이 특징이며, 대부분 씨가 없어 먹기에도 편합니다. <br className="hidden md:block" />
+                            (드물게 씨가 있을 수 있습니다)
+                        </p>
+                    </div>
 
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start pt-4">
+                    <div className="flex flex-col w-full px-8 md:px-0 gap-3 justify-center md:justify-start pt-2 md:pt-4">
                         <button
                             onClick={scrollToOrder}
-                            className="px-8 py-4 bg-gotgam-orange hover:bg-orange-600 text-white rounded-full shadow-lg shadow-orange-500/30 transition-all hover:-translate-y-1 text-lg font-bold min-w-[160px]"
+                            className="w-full md:w-auto px-8 py-3 md:py-4 bg-gotgam-orange hover:bg-orange-600 text-white rounded-full shadow-lg shadow-orange-500/30 transition-all hover:-translate-y-1 text-lg font-bold"
                         >
                             주문하기
                         </button>
                         
                         <Link
                             href="/check"
-                            className="px-8 py-4 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full hover:bg-white/20 transition-all hover:-translate-y-1 text-lg font-medium min-w-[160px]"
+                            className="w-full md:w-auto px-8 py-3 md:py-4 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full hover:bg-white/20 transition-all hover:-translate-y-1 text-lg font-medium text-center"
                         >
                             주문 조회
                         </Link>
