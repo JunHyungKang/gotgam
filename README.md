@@ -1,4 +1,4 @@
-# 영동곧감 주문 사이트 (Yeongdong Gotgam Order Site)
+# 영동곶감 주문 사이트 (Yeongdong Gotgam Order Site)
 
 영동 명품 곶감 주문 및 관리를 위한 웹 애플리케이션입니다.
 

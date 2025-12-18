@@ -352,7 +352,7 @@ export default function OrderForm() {
                             {/* Product 1: 30구 */}
                             <div className="flex justify-between items-center border-b border-gray-200 pb-4">
                                 <div>
-                                    <p className="font-bold text-lg text-gray-800">30구 (대과)</p>
+                                    <p className="font-bold text-lg text-gray-800">프리미엄 (30구)</p>
                                     <p className="text-gotgam-brown">40,000원</p>
                                 </div>
                                 <div className="flex items-center space-x-3">
@@ -383,7 +383,7 @@ export default function OrderForm() {
                             {/* Product 2: 35구 */}
                             <div className="flex justify-between items-center pb-2">
                                 <div>
-                                    <p className="font-bold text-lg text-gray-800">35구 (실속형)</p>
+                                    <p className="font-bold text-lg text-gray-800">실속형 (35구)</p>
                                     <p className="text-gotgam-brown">40,000원</p>
                                 </div>
                                 <div className="flex items-center space-x-3">

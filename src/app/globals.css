@@ -10,4 +10,11 @@
 body {
   background-color: var(--color-gotgam-cream);
   color: var(--color-gotgam-brown);
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+html {
+  overflow-x: hidden;
+  max-width: 100vw;
 }

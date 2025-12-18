@@ -7,8 +7,8 @@ import { useState, useEffect } from 'react'
 const productImages = [
     {
         src: "/images/uploaded_image_3_1765804097961.jpg",
-        title: "명품 세트 30구 / 35구",
-        desc: "40,000원 ~"
+        title: "자연 건조로 말린 반건조 곶감 (30구/35구)",
+        desc: "명품 세트"
     },
     {
         src: "/images/uploaded_image_0_1765804097961.jpg",
