@@ -40,7 +40,7 @@ export default function Hero() {
     }
 
     return (
-        <section className="relative h-screen md:min-h-[700px] flex items-center overflow-hidden bg-stone-900">
+        <section className="relative h-auto md:min-h-[700px] flex flex-col md:flex-row items-center overflow-hidden bg-stone-900 pb-8 md:pb-0">
             {/* Background: Tree Image (Atmosphere) */}
             <div className="absolute inset-0 z-0">
                 <Image
@@ -57,7 +57,7 @@ export default function Hero() {
             </div>
 
             {/* Content Container */}
-            <div className="container mx-auto px-4 relative z-10 h-full flex flex-col md:flex-row items-center justify-center md:justify-between gap-8 md:gap-12 pt-0 md:pt-20">
+            <div className="container mx-auto px-4 relative z-10 w-full flex flex-col md:flex-row items-center justify-center md:justify-between gap-8 md:gap-12 pt-20 md:pt-20">
                 
                 <div className="flex-1 text-center md:text-left space-y-6 md:space-y-8 animate-fade-in-up max-w-2xl w-full flex flex-col items-center md:items-start justify-center">
                     <div className="space-y-2 md:space-y-4">
@@ -78,24 +78,24 @@ export default function Hero() {
                         </p>
                     </div>
 
-                    <div className="flex flex-col w-full px-8 md:px-0 gap-3 justify-center md:justify-start pt-2 md:pt-4">
+                    <div className="flex flex-row w-full px-4 md:px-0 gap-3 justify-center md:justify-start pt-2 md:pt-4">
                         <button
                             onClick={scrollToOrder}
-                            className="w-full md:w-auto px-8 py-3 md:py-4 bg-gotgam-orange hover:bg-orange-600 text-white rounded-full shadow-lg shadow-orange-500/30 transition-all hover:-translate-y-1 text-lg font-bold"
+                            className="flex-1 md:flex-none md:w-auto px-4 md:px-8 py-3 md:py-4 bg-gotgam-orange hover:bg-orange-600 text-white rounded-full shadow-lg shadow-orange-500/30 transition-all hover:-translate-y-1 text-base md:text-lg font-bold whitespace-nowrap"
                         >
                             주문하기
                         </button>
                         
                         <Link
                             href="/check"
-                            className="w-full md:w-auto px-8 py-3 md:py-4 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full hover:bg-white/20 transition-all hover:-translate-y-1 text-lg font-medium text-center"
+                            className="flex-1 md:flex-none md:w-auto px-4 md:px-8 py-3 md:py-4 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full hover:bg-white/20 transition-all hover:-translate-y-1 text-base md:text-lg font-medium text-center whitespace-nowrap"
                         >
                             주문 조회
                         </Link>
                     </div>
                 </div>
 
-                {/* Right: Product Image Carousel (Stacked Cards) */}
+                {/* Right: Product Image Carousel (Stacked Cards) - Desktop Only */}
                 <div className="flex-1 w-full max-w-md md:max-w-lg relative animate-fade-in-up delay-200 hidden md:block h-[500px] perspective-1000">
                     <div className="relative w-full h-full flex items-center justify-center">
                         {productImages.map((img, index) => {
@@ -151,6 +151,30 @@ export default function Hero() {
                             />
                         ))}
                     </div>
+                </div>
+            </div>
+
+            {/* Mobile Carousel (Peeking Effect) */}
+            <div className="md:hidden w-full relative z-10 mt-8 mb-4 pl-4 overflow-x-hidden">
+                <div className="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory px-4" style={{ scrollPaddingLeft: '1rem', scrollPaddingRight: '20%' }}>
+                    {productImages.map((img, index) => (
+                        <div 
+                            key={index} 
+                            className="flex-none w-[85%] aspect-[4/3] relative rounded-2xl overflow-hidden shadow-lg snap-center border border-white/10 bg-stone-800"
+                        >
+                            <Image
+                                src={img.src}
+                                alt={img.title}
+                                fill
+                                className="object-cover"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                            <div className="absolute bottom-4 left-4 right-4 text-white">
+                                <p className="font-bold text-lg mb-1">{img.title}</p>
+                                <p className="text-sm text-gray-300">{img.desc}</p>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </div>
         </section>

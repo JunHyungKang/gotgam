@@ -2,7 +2,7 @@ import Image from 'next/image'
 
 export default function ProductSection() {
     return (
-        <section className="py-20 bg-gotgam-cream">
+        <section className="py-12 md:py-20 bg-gotgam-cream">
             <div className="container mx-auto px-4">
                 <h2 className="text-3xl md:text-4xl font-bold text-center text-gotgam-brown mb-4">
                     상품 소개
