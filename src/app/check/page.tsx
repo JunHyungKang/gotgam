@@ -14,6 +14,17 @@ export default function CheckOrderPage() {
     const [showModal, setShowModal] = useState(false)
     const [totalAmount, setTotalAmount] = useState(0)
 
+    const formatPhoneNumber = (value: string) => {
+        const numbers = value.replace(/[^\d]/g, '')
+        if (numbers.length <= 3) return numbers
+        if (numbers.length <= 7) return `${numbers.slice(0, 3)}-${numbers.slice(3)}`
+        return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7, 11)}`
+    }
+
+    const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setPhone(formatPhoneNumber(e.target.value))
+    }
+
     const handleLookup = async (e: React.FormEvent) => {
         e.preventDefault()
         setLoading(true)
@@ -98,7 +109,7 @@ export default function CheckOrderPage() {
                                 type="tel"
                                 id="phone"
                                 value={phone}
-                                onChange={(e) => setPhone(e.target.value)}
+                                onChange={handlePhoneChange}
                                 required
                                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gotgam-orange focus:border-transparent outline-none"
                                 placeholder="예: 010-1234-5678"

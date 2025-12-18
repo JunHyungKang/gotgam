@@ -198,7 +198,7 @@ export default function OrderForm() {
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Sender Info */}
-                    <div className="bg-gotgam-cream/30 p-6 rounded-xl space-y-4">
+                    <div className="bg-gotgam-cream/30 p-4 md:p-6 rounded-xl space-y-4">
                         <h3 className="text-xl font-bold text-gotgam-brown mb-4">보내는 분</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
@@ -249,7 +249,7 @@ export default function OrderForm() {
                                 <button
                                     type="button"
                                     onClick={() => openSearch('sender')}
-                                    className="px-4 py-2 bg-gotgam-brown text-white rounded-lg hover:bg-opacity-90 transition-colors whitespace-nowrap"
+                                    className="px-3 md:px-4 py-2 bg-gotgam-brown text-white rounded-lg hover:bg-opacity-90 transition-colors whitespace-nowrap text-sm md:text-base"
                                 >
                                     주소 검색
                                 </button>
@@ -265,7 +265,7 @@ export default function OrderForm() {
                     </div>
 
                     {/* Receiver Info */}
-                    <div className="bg-gotgam-cream/30 p-6 rounded-xl space-y-4">
+                    <div className="bg-gotgam-cream/30 p-4 md:p-6 rounded-xl space-y-4">
                         <div className="flex justify-between items-center mb-4">
                             <h3 className="text-xl font-bold text-gotgam-brown">받는 분</h3>
                             <div className="flex items-center">
@@ -330,7 +330,7 @@ export default function OrderForm() {
                                 <button
                                     type="button"
                                     onClick={() => openSearch('receiver')}
-                                    className="px-4 py-2 bg-gotgam-brown text-white rounded-lg hover:bg-opacity-90 transition-colors whitespace-nowrap"
+                                    className="px-3 md:px-4 py-2 bg-gotgam-brown text-white rounded-lg hover:bg-opacity-90 transition-colors whitespace-nowrap text-sm md:text-base"
                                 >
                                     주소 검색
                                 </button>
@@ -346,7 +346,7 @@ export default function OrderForm() {
                     </div>
                     
                     {/* Product Info */}
-                    <div className="bg-gotgam-cream/30 p-6 rounded-xl space-y-4">
+                    <div className="bg-gotgam-cream/30 p-4 md:p-6 rounded-xl space-y-4">
                         <h3 className="text-xl font-bold text-gotgam-brown mb-4">주문 정보</h3>
                         <div className="space-y-6">
                             {/* Product 1: 30구 */}
