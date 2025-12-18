@@ -40,7 +40,7 @@ export default function Hero() {
     }
 
     return (
-        <section className="relative min-h-[600px] h-auto flex items-center overflow-hidden bg-stone-900 pb-12 pt-24 md:pt-0">
+        <section className="relative h-screen md:min-h-[700px] flex items-center overflow-hidden bg-stone-900">
             {/* Background: Tree Image (Atmosphere) */}
             <div className="absolute inset-0 z-0">
                 <Image
@@ -57,9 +57,9 @@ export default function Hero() {
             </div>
 
             {/* Content Container */}
-            <div className="container mx-auto px-4 relative z-10 h-full flex flex-col md:flex-row items-center justify-center md:justify-between gap-8 md:gap-12">
+            <div className="container mx-auto px-4 relative z-10 h-full flex flex-col md:flex-row items-center justify-center md:justify-between gap-8 md:gap-12 pt-0 md:pt-20">
                 
-                <div className="flex-1 text-center md:text-left space-y-6 md:space-y-8 animate-fade-in-up max-w-2xl w-full flex flex-col items-center md:items-start justify-center order-1 md:order-1 mt-8 md:mt-0">
+                <div className="flex-1 text-center md:text-left space-y-6 md:space-y-8 animate-fade-in-up max-w-2xl w-full flex flex-col items-center md:items-start justify-center">
                     <div className="space-y-2 md:space-y-4">
                         <h1 className="text-4xl md:text-7xl text-white drop-shadow-lg leading-tight font-['Noto_Sans_KR'] font-bold">
                             물한리 자연이 빚은 <br/>
@@ -95,45 +95,61 @@ export default function Hero() {
                     </div>
                 </div>
 
-                {/* Right: Product Image Carousel (Peeking Effect) */}
-                <div className="flex-1 w-full max-w-md md:max-w-lg relative animate-fade-in-up delay-200 h-[320px] md:h-[500px] perspective-1000 order-2 md:order-2 mt-4 md:mt-0">
+                {/* Right: Product Image Carousel (Stacked Cards) */}
+                <div className="flex-1 w-full max-w-md md:max-w-lg relative animate-fade-in-up delay-200 hidden md:block h-[500px] perspective-1000">
                     <div className="relative w-full h-full flex items-center justify-center">
                         {productImages.map((img, index) => {
                             // Calculate position relative to current slide
-                            // 0: Active, 1: Next, 2: Last (Prev)
+                            // 0: Active, 1: Next, 2: Last (in 3 items)
                             const position = (index - currentSlide + productImages.length) % productImages.length;
                             
                             let cardStyle = "";
                             let zIndex = 0;
 
-                            if (position === 0) { // Active (Center)
-                                cardStyle = "left-1/2 -translate-x-1/2 scale-100 opacity-100 z-30 shadow-2xl";
-                            } else if (position === 1) { // Next (Right Peeking)
-                                cardStyle = "left-[85%] -translate-x-1/2 scale-90 opacity-50 z-10 shadow-lg blur-[1px] brightness-50";
-                            } else { // Prev (Left Peeking) - position 2 in 3 items
-                                cardStyle = "left-[15%] -translate-x-1/2 scale-90 opacity-50 z-10 shadow-lg blur-[1px] brightness-50";
+                            if (position === 0) { // Active
+                                cardStyle = "scale-100 opacity-100 rotate-0 translate-x-0 translate-y-0 shadow-2xl skew-x-0";
+                                zIndex = 30;
+                            } else if (position === 1) { // Next
+                                cardStyle = "scale-95 opacity-70 rotate-6 translate-x-8 translate-y-4 shadow-xl";
+                                zIndex = 20;
+                            } else { // Last (Upcoming / Previous)
+                                cardStyle = "scale-90 opacity-40 rotate-12 translate-x-16 translate-y-8 shadow-lg";
+                                zIndex = 10;
                             }
 
                             return (
                                 <div 
                                     key={index}
-                                    className={`absolute top-1/2 -translate-y-1/2 w-[70%] md:w-[70%] aspect-square rounded-3xl overflow-hidden border border-white/10 ring-1 ring-white/20 transition-all duration-700 ease-in-out bg-stone-800 ${cardStyle}`}
+                                    className={`absolute w-full aspect-square rounded-3xl overflow-hidden border border-white/10 ring-1 ring-white/20 transition-all duration-700 ease-in-out bg-stone-800 ${cardStyle}`}
+                                    style={{ zIndex }}
                                 >
                                     <Image
                                         src={img.src}
                                         alt={img.title}
                                         fill
                                         className="object-cover"
-                                        sizes="(max-width: 768px) 70vw, 35vw"
+                                        sizes="(max-width: 768px) 100vw, 50vw"
                                     />
                                     {/* Glass Badge - Only visible on active card */}
-                                    <div className={`absolute bottom-4 left-4 right-4 md:bottom-6 md:left-6 md:right-6 bg-black/50 backdrop-blur-md p-3 md:p-4 rounded-xl border border-white/10 text-white transition-opacity duration-300 ${position === 0 ? 'opacity-100' : 'opacity-0'}`}>
-                                        <p className="font-serif text-base md:text-lg font-bold">{img.title}</p>
-                                        <p className="text-xs md:text-sm text-gray-300">{img.desc}</p>
+                                    <div className={`absolute bottom-6 left-6 right-6 bg-black/50 backdrop-blur-md p-4 rounded-xl border border-white/10 text-white transition-opacity duration-300 ${position === 0 ? 'opacity-100' : 'opacity-0'}`}>
+                                        <p className="font-serif text-lg">{img.title}</p>
+                                        <p className="text-sm text-gray-300">{img.desc}</p>
                                     </div>
                                 </div>
                             )
                         })}
+                    </div>
+                    
+                    {/* Carousel Indicators */}
+                    <div className="absolute -bottom-8 left-0 right-0 flex justify-center gap-2">
+                        {productImages.map((_, index) => (
+                            <button
+                                key={index}
+                                onClick={() => setCurrentSlide(index)}
+                                className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentSlide ? 'bg-gotgam-orange w-6' : 'bg-white/30 hover:bg-white/50'}`}
+                                aria-label={`Go to slide ${index + 1}`}
+                            />
+                        ))}
                     </div>
                 </div>
             </div>
