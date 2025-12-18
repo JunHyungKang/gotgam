@@ -62,9 +62,6 @@ export default function Hero() {
                 {/* Left: Text Content */}
                 <div className="flex-1 text-center md:text-left space-y-8 animate-fade-in-up max-w-2xl">
                     <div className="space-y-4">
-                        <span className="inline-block px-4 py-1.5 border border-white/30 rounded-full text-sm md:text-base text-white/80 font-light tracking-widest backdrop-blur-sm">
-                            2025년 설 명절 선물세트
-                        </span>
                         <h1 className="text-5xl md:text-7xl font-bold text-white font-serif drop-shadow-lg leading-tight">
                             자연이 빚은 <br/>
                             <span className="text-gotgam-orange">명품 영동 곶감</span>

@@ -1,22 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Noto_Serif_KR } from "next/font/google";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const notoSerifKR = Noto_Serif_KR({
-  variable: "--font-noto-serif",
-  subsets: ["latin"],
-  weight: ["200", "400", "700", "900"],
-});
 
 export const metadata: Metadata = {
   title: "영동곧감-주문 사이트",
@@ -30,8 +13,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
+      <head>
+        <link rel="stylesheet" as="style" crossOrigin="anonymous" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css" />
+      </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${notoSerifKR.variable} antialiased font-sans`}
+        className="antialiased font-sans"
       >
         {children}
       </body>

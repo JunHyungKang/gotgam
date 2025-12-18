@@ -6,7 +6,7 @@ export default function Footer() {
             <div className="container mx-auto px-4 text-center">
                 <h3 className="text-xl font-bold mb-4">영동 곶감</h3>
                 <p className="mb-2">충청북도 영동군 상촌면 물한리</p>
-                <p className="mb-6">문의: 010-XXXX-XXXX</p>
+                <p className="mb-6">문의: 010-3153-3822</p>
 
                 <div className="border-t border-gotgam-cream/20 pt-6">
                     <p className="text-sm opacity-80 mb-2">무통장 입금 계좌 안내</p>

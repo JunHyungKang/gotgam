@@ -141,16 +141,29 @@ export default function OrderForm() {
 
         // Prepare batch data
         const ordersToInsert = []
-        let totalAmount = 0
+        let productTotal = 0
 
         if (quantities['30구'] > 0) {
             ordersToInsert.push({ ...commonData, product_type: '30구', quantity: quantities['30구'] })
-            totalAmount += quantities['30구'] * 40000
+            productTotal += quantities['30구'] * 40000
         }
         if (quantities['35구'] > 0) {
             ordersToInsert.push({ ...commonData, product_type: '35구', quantity: quantities['35구'] })
-            totalAmount += quantities['35구'] * 40000
+            productTotal += quantities['35구'] * 40000
         }
+
+        const totalQuantity = (quantities['30구'] || 0) + (quantities['35구'] || 0)
+        const shippingFee = totalQuantity === 1 ? 4000 : 0
+        const finalTotalAmount = productTotal + shippingFee
+
+        // Generate Group ID
+        const groupId = crypto.randomUUID()
+        
+        // Add group_id to all orders
+        const ordersWithGroup = ordersToInsert.map(order => ({
+            ...order,
+            group_id: groupId
+        }))
 
         if (ordersToInsert.length === 0) {
             setMessage('최소 1개 이상의 상품을 선택해주세요.')
@@ -159,9 +172,9 @@ export default function OrderForm() {
         }
 
         try {
-            const { error } = await supabase.from('orders').insert(ordersToInsert)
+            const { error } = await supabase.from('orders').insert(ordersWithGroup)
             if (error) throw error
-            router.push(`/success?amount=${totalAmount}`)
+            router.push(`/success?amount=${finalTotalAmount}`)
         } catch (error) {
             console.error(error)
             setMessage('주문 접수 중 오류가 발생했습니다. 다시 시도해주세요.')
@@ -399,11 +412,30 @@ export default function OrderForm() {
                             </div>
 
                             {/* Total Price Estimate */}
-                            <div className="bg-white p-4 rounded-lg flex justify-between items-center border border-orange-100">
-                                <span className="font-bold text-gray-700">총 결제 예상 금액</span>
-                                <span className="text-2xl font-bold text-gotgam-orange">
-                                    {((quantities['30구'] * 40000) + (quantities['35구'] * 40000)).toLocaleString()}원
-                                </span>
+                            <div className="bg-white p-4 rounded-lg border border-orange-100 space-y-2">
+                                <div className="flex justify-between items-center text-sm text-gray-600">
+                                    <span>상품 금액</span>
+                                    <span>
+                                        {((quantities['30구'] * 40000) + (quantities['35구'] * 40000)).toLocaleString()}원
+                                    </span>
+                                </div>
+                                <div className="flex justify-between items-center text-sm text-gray-600">
+                                    <span>배송비</span>
+                                    <span>
+                                        {((quantities['30구'] + quantities['35구']) === 1 ? 4000 : 0).toLocaleString()}원
+                                    </span>
+                                </div>
+                                <div className="border-t border-gray-100 my-2 pt-2 flex justify-between items-center">
+                                    <span className="font-bold text-gray-700">총 결제 예상 금액</span>
+                                    <span className="text-2xl font-bold text-gotgam-orange">
+                                        {(((quantities['30구'] * 40000) + (quantities['35구'] * 40000)) + ((quantities['30구'] + quantities['35구']) === 1 ? 4000 : 0)).toLocaleString()}원
+                                    </span>
+                                </div>
+                                {(quantities['30구'] + quantities['35구']) >= 1 && (
+                                     <p className="text-xs text-gotgam-orange/80 text-right mt-1">
+                                        * 2상자 이상 주문 시 배송비 무료
+                                     </p>
+                                )}
                             </div>
 
                             <div>
@@ -414,6 +446,7 @@ export default function OrderForm() {
                                     name="message"
                                     id="message"
                                     rows={3}
+                                    placeholder="배송 받기 원하시는 날짜가 있다면 적어주세요. (그 외 전하실 말씀)"
                                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gotgam-orange focus:border-transparent outline-none resize-none"
                                 />
                             </div>

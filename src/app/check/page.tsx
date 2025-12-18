@@ -34,9 +34,24 @@ export default function CheckOrderPage() {
             setOrders(data || [])
             if (data && data.length > 0) {
                 // Calculate total amount for pending orders
-                const pendingTotal = data
-                    .filter((order: any) => order.status === 'pending')
-                    .reduce((sum: number, order: any) => sum + (order.quantity * 40000), 0)
+                // Calculate total amount for pending orders with grouping logic
+                const pendingOrders = data.filter((order: any) => order.status === 'pending')
+                
+                // Group pending orders
+                const groups: { [key: string]: any[] } = {}
+                pendingOrders.forEach((order: any) => {
+                    const key = order.group_id || order.id
+                    if (!groups[key]) groups[key] = []
+                    groups[key].push(order)
+                })
+
+                let pendingTotal = 0
+                Object.values(groups).forEach(group => {
+                    const groupQty = group.reduce((sum, o) => sum + o.quantity, 0)
+                    const groupProductTotal = groupQty * 40000
+                    const shipping = groupQty === 1 ? 4000 : 0
+                    pendingTotal += groupProductTotal + shipping
+                })
                 
                 setTotalAmount(pendingTotal)
                 setShowModal(true)
@@ -125,29 +140,67 @@ export default function CheckOrderPage() {
                             {orders.length === 0 ? (
                                 <p className="text-center text-gray-500 py-4">일치하는 주문 내역이 없습니다.</p>
                             ) : (
-                                <div className="space-y-4">
-                                    {orders.map((order) => (
-                                        <div key={order.id} className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                                            <div className="flex justify-between items-start mb-2">
-                                                <span className="text-sm text-gray-500">
-                                                    {new Date(order.created_at).toLocaleDateString()}
-                                                </span>
-                                                <span className={`text-xs font-bold px-2 py-1 rounded
-                          ${order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                                        order.status === 'paid' ? 'bg-blue-100 text-blue-800' :
-                                                            order.status === 'shipped' ? 'bg-green-100 text-green-800' : 'bg-gray-100'}`}>
-                                                    {order.status === 'pending' ? '접수완료' :
-                                                        order.status === 'paid' ? '입금확인' :
-                                                            order.status === 'shipped' ? '발송완료' : order.status}
-                                                </span>
-                                            </div>
-                                            <div className="space-y-1 text-sm text-gray-700">
-                                                <p><span className="font-medium">상품:</span> {order.product_type} ({order.quantity}개)</p>
-                                                <p><span className="font-medium">받는 분:</span> {order.receiver_name}</p>
-                                                <p><span className="font-medium">주소:</span> {order.address}</p>
-                                            </div>
-                                        </div>
-                                    ))}
+                                <div className="space-y-6">
+                                    {/* Group logic within map is tricky, so we likely need to pre-group or group on the fly. 
+                                        Let's group first. */}
+                                    {(() => {
+                                        const groups: { [key: string]: any[] } = {}
+                                        orders.forEach((order: any) => {
+                                            const key = order.group_id || order.id
+                                            if (!groups[key]) groups[key] = []
+                                            groups[key].push(order)
+                                        })
+                                        
+                                        return Object.values(groups).map((group, groupIndex) => {
+                                            const firstOrder = group[0]
+                                            const totalQuantity = group.reduce((sum, o) => sum + o.quantity, 0)
+                                            const productTotal = totalQuantity * 40000
+                                            const shippingFee = totalQuantity === 1 ? 4000 : 0
+                                            const totalAmount = productTotal + shippingFee
+                                            
+                                            // Status Check (if mixed, might be tricky, but usually same)
+                                            // We take first order status
+                                            return (
+                                                <div key={groupIndex} className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                                                    <div className="bg-gray-50 px-4 py-3 border-b border-gray-100 flex justify-between items-center">
+                                                        <div className="text-sm text-gray-500">
+                                                            {new Date(firstOrder.created_at).toLocaleDateString()}
+                                                            <span className="mx-2">|</span>
+                                                            <span className="font-medium text-gray-700">총 {totalAmount.toLocaleString()}원</span>
+                                                        </div>
+                                                        <span className={`text-xs font-bold px-2 py-1 rounded
+                                                            ${firstOrder.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                                                firstOrder.status === 'paid' ? 'bg-blue-100 text-blue-800' :
+                                                                    firstOrder.status === 'shipped' ? 'bg-green-100 text-green-800' : 'bg-gray-100'}`}>
+                                                            {firstOrder.status === 'pending' ? '접수완료' :
+                                                                firstOrder.status === 'paid' ? '입금확인' :
+                                                                    firstOrder.status === 'shipped' ? '발송완료' : firstOrder.status}
+                                                        </span>
+                                                    </div>
+                                                    <div className="p-4 space-y-3">
+                                                        {group.map((order: any) => (
+                                                            <div key={order.id} className="flex justify-between items-start">
+                                                                <div>
+                                                                    <p className="font-bold text-gray-800">{order.product_type} <span className="text-gotgam-orange">{order.quantity}박스</span></p>
+                                                                    <p className="text-sm text-gray-500 mt-1">받는 분: {order.receiver_name}</p>
+                                                                    <p className="text-xs text-gray-400">{order.address}</p>
+                                                                </div>
+                                                                <div className="text-right">
+                                                                    <p className="font-medium text-gray-700">{(order.quantity * 40000).toLocaleString()}원</p>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                        {shippingFee > 0 && (
+                                                            <div className="flex justify-between items-center pt-2 border-t border-gray-100 text-sm text-gray-600">
+                                                                <span>배송비</span>
+                                                                <span>{shippingFee.toLocaleString()}원</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            )
+                                        })
+                                    })()}
                                 </div>
                             )}
                         </div>
