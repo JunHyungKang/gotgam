@@ -385,7 +385,7 @@ export default function OrderForm() {
                                             {/* 30구 */}
                                             <div className="flex justify-between items-center">
                                                 <div>
-                                                    <p className="font-bold text-gray-800">프리미엄 (30구)</p>
+                                                    <p className="font-bold text-gray-800">프리미엄 선물세트 (30구)</p>
                                                     <p className="text-sm text-gray-500">40,000원</p>
                                                 </div>
                                                 <div className="flex items-center space-x-3 bg-white px-2 py-1 rounded-lg border border-orange-100">

@@ -24,7 +24,7 @@ export default function ProductSection() {
                         </div>
                         <div className="p-6">
                             <h3 className="text-2xl font-bold text-gotgam-brown mb-2">
-                                프리미엄 (30구)
+                                프리미엄 선물세트 (30구)
                             </h3>
                             <p className="text-gray-500 mb-4">큼직하고 먹음직스러운 최상급 곶감</p>
                             <div className="flex justify-between items-center border-t border-gray-100 pt-4">

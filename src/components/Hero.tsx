@@ -12,12 +12,12 @@ const productImages = [
     },
     {
         src: "/images/uploaded_image_0_1765804097961.jpg",
-        title: "프리미엄 선물세트",
+        title: "프리미엄 선물세트 (30구)",
         desc: "최상의 품질"
     },
     {
         src: "/images/uploaded_image_1_1765804097961.jpg",
-        title: "실속형 가정용",
+        title: "실속형 (35구)",
         desc: "달콤한 간식"
     }
 ]
