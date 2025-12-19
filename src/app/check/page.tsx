@@ -5,11 +5,27 @@ import { supabase } from '@/lib/supabaseClient'
 import Link from 'next/link'
 import BankAccountModal from '@/components/BankAccountModal'
 
+type Order = {
+    id: string
+    created_at: string
+    sender_name: string
+    sender_phone: string
+    sender_address: string
+    receiver_name: string
+    receiver_phone: string
+    address: string
+    product_type: string
+    quantity: number
+    status: string
+    group_id?: string
+    message?: string
+}
+
 export default function CheckOrderPage() {
     const [name, setName] = useState('')
     const [phone, setPhone] = useState('')
     const [loading, setLoading] = useState(false)
-    const [orders, setOrders] = useState<any[]>([])
+    const [orders, setOrders] = useState<Order[]>([])
     const [searched, setSearched] = useState(false)
     const [showModal, setShowModal] = useState(false)
     const [totalAmount, setTotalAmount] = useState(0)
@@ -43,25 +59,37 @@ export default function CheckOrderPage() {
 
             if (error) throw error
             setOrders(data || [])
+            
             if (data && data.length > 0) {
-                // Calculate total amount for pending orders
-                // Calculate total amount for pending orders with grouping logic
-                const pendingOrders = data.filter((order: any) => order.status === 'pending')
+                // Calculate Total Pending Amount
+                const pendingOrders = data.filter((order: Order) => order.status === 'pending')
                 
-                // Group pending orders
-                const groups: { [key: string]: any[] } = {}
-                pendingOrders.forEach((order: any) => {
+                // Group by Group ID first
+                const groups: { [key: string]: Order[] } = {}
+                pendingOrders.forEach((order: Order) => {
                     const key = order.group_id || order.id
                     if (!groups[key]) groups[key] = []
                     groups[key].push(order)
                 })
 
                 let pendingTotal = 0
+                
                 Object.values(groups).forEach(group => {
-                    const groupQty = group.reduce((sum, o) => sum + o.quantity, 0)
-                    const groupProductTotal = groupQty * 40000
-                    const shipping = groupQty === 1 ? 4000 : 0
-                    pendingTotal += groupProductTotal + shipping
+                    // Within a group, we need to group by Recipient (Address/Name) to calculate shipping
+                    // Key: receiver_name + address
+                    const recipientGroups: { [key: string]: Order[] } = {}
+                    group.forEach(order => {
+                        const key = `${order.receiver_name}-${order.address}`
+                        if (!recipientGroups[key]) recipientGroups[key] = []
+                        recipientGroups[key].push(order)
+                    })
+
+                    Object.values(recipientGroups).forEach(rGroup => {
+                        const rQty = rGroup.reduce((sum, o) => sum + o.quantity, 0)
+                        const rProductTotal = rGroup.reduce((sum, o) => sum + (o.quantity * 40000), 0)
+                        const rShipping = rQty >= 2 ? 0 : 4000
+                        pendingTotal += rProductTotal + rShipping
+                    })
                 })
                 
                 setTotalAmount(pendingTotal)
@@ -79,7 +107,7 @@ export default function CheckOrderPage() {
         <div className="min-h-screen bg-gotgam-cream/20 py-20 px-4">
             <BankAccountModal isOpen={showModal} onClose={() => setShowModal(false)} amount={totalAmount} />
             
-            <div className="max-w-md mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-gotgam-orange/10">
+            <div className="max-w-xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-gotgam-orange/10">
                 <div className="bg-gotgam-brown p-6 text-center">
                     <h1 className="text-2xl font-bold text-white">주문 조회</h1>
                     <p className="text-gotgam-cream/80 text-sm mt-1">비회원 주문 내역 확인</p>
@@ -127,17 +155,21 @@ export default function CheckOrderPage() {
                     {searched && (
                         <div className="mt-8 border-t pt-6">
                             
-                            {/* Bank Info Section - Always visible when searched and found */}
+                            {/* Bank Info Section */}
                             {orders.length > 0 && (
                                 <div className="bg-yellow-50 p-4 rounded-xl border border-yellow-100 mb-6">
                                     <h3 className="font-bold text-gray-800 mb-2 flex items-center">
                                         <span className="w-2 h-2 bg-gotgam-orange rounded-full mr-2"></span>
                                         입금 계좌 안내
                                     </h3>
-                                    {totalAmount > 0 && (
+                                    {totalAmount > 0 ? (
                                         <div className="mb-3 pb-3 border-b border-yellow-200">
-                                            <p className="text-sm text-gray-600">총 입금하실 금액</p>
+                                            <p className="text-sm text-gray-600">총 입금하실 금액 (배송비 포함)</p>
                                             <p className="text-xl font-bold text-gotgam-orange">{totalAmount.toLocaleString()}원</p>
+                                        </div>
+                                    ) : (
+                                        <div className="mb-3 pb-3 border-b border-yellow-200">
+                                            <p className="text-sm text-gray-600">모든 주문이 결제 완료되었습니다.</p>
                                         </div>
                                     )}
                                     <div className="text-sm space-y-1 text-gray-700 ml-4">
@@ -152,11 +184,10 @@ export default function CheckOrderPage() {
                                 <p className="text-center text-gray-500 py-4">일치하는 주문 내역이 없습니다.</p>
                             ) : (
                                 <div className="space-y-6">
-                                    {/* Group logic within map is tricky, so we likely need to pre-group or group on the fly. 
-                                        Let's group first. */}
                                     {(() => {
-                                        const groups: { [key: string]: any[] } = {}
-                                        orders.forEach((order: any) => {
+                                        // Group by Group ID
+                                        const groups: { [key: string]: Order[] } = {}
+                                        orders.forEach((order) => {
                                             const key = order.group_id || order.id
                                             if (!groups[key]) groups[key] = []
                                             groups[key].push(order)
@@ -164,20 +195,35 @@ export default function CheckOrderPage() {
                                         
                                         return Object.values(groups).map((group, groupIndex) => {
                                             const firstOrder = group[0]
-                                            const totalQuantity = group.reduce((sum, o) => sum + o.quantity, 0)
-                                            const productTotal = totalQuantity * 40000
-                                            const shippingFee = totalQuantity === 1 ? 4000 : 0
-                                            const totalAmount = productTotal + shippingFee
                                             
-                                            // Status Check (if mixed, might be tricky, but usually same)
-                                            // We take first order status
+                                            // Sub-group by Recipient Address/Name for calculation
+                                            const recipientGroups: { [key: string]: Order[] } = {}
+                                            group.forEach(order => {
+                                                const key = `${order.receiver_name}-${order.address}`
+                                                if (!recipientGroups[key]) recipientGroups[key] = []
+                                                recipientGroups[key].push(order)
+                                            })
+                                            
+                                            const recipientKeys = Object.keys(recipientGroups)
+                                            let totalGroupAmount = 0
+                                            
+                                            // Pre-calculate total amount
+                                            Object.values(recipientGroups).forEach(rGroup => {
+                                                const qty = rGroup.reduce((sum, o) => sum + o.quantity, 0)
+                                                const shipping = qty >= 2 ? 0 : 4000
+                                                const prod = rGroup.reduce((sum, o) => sum + (o.quantity * 40000), 0)
+                                                totalGroupAmount += prod + shipping
+                                            })
+
                                             return (
                                                 <div key={groupIndex} className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                                                    
+                                                    {/* Header */}
                                                     <div className="bg-gray-50 px-4 py-3 border-b border-gray-100 flex justify-between items-center">
                                                         <div className="text-sm text-gray-500">
                                                             {new Date(firstOrder.created_at).toLocaleDateString()}
                                                             <span className="mx-2">|</span>
-                                                            <span className="font-medium text-gray-700">총 {totalAmount.toLocaleString()}원</span>
+                                                            <span className="font-bold text-gotgam-brown">{recipientKeys.length}곳 배송</span>
                                                         </div>
                                                         <span className={`text-xs font-bold px-2 py-1 rounded
                                                             ${firstOrder.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
@@ -188,25 +234,46 @@ export default function CheckOrderPage() {
                                                                     firstOrder.status === 'shipped' ? '발송완료' : firstOrder.status}
                                                         </span>
                                                     </div>
-                                                    <div className="p-4 space-y-3">
-                                                        {group.map((order: any) => (
-                                                            <div key={order.id} className="flex justify-between items-start">
-                                                                <div>
-                                                                    <p className="font-bold text-gray-800">{order.product_type} <span className="text-gotgam-orange">{order.quantity}박스</span></p>
-                                                                    <p className="text-sm text-gray-500 mt-1">받는 분: {order.receiver_name}</p>
-                                                                    <p className="text-xs text-gray-400">{order.address}</p>
+
+                                                    {/* Recipient Lists */}
+                                                    <div className="divide-y divide-gray-100">
+                                                        {Object.values(recipientGroups).map((rGroup, idx) => {
+                                                            const rFirst = rGroup[0]
+                                                            const rQty = rGroup.reduce((sum, o) => sum + o.quantity, 0)
+                                                            const shippingFee = rQty >= 2 ? 0 : 4000
+                                                            
+                                                            return (
+                                                                <div key={idx} className="p-4">
+                                                                    <div className="flex justify-between mb-2">
+                                                                        <div>
+                                                                            <p className="font-bold text-gray-800">{rFirst.receiver_name}</p>
+                                                                            <p className="text-xs text-gray-400">{rFirst.address}</p>
+                                                                        </div>
+                                                                        <div className="text-right">
+                                                                            <span className={`text-xs px-2 py-1 rounded-full ${shippingFee === 0 ? 'bg-orange-100 text-gotgam-orange' : 'bg-gray-100 text-gray-500'}`}>
+                                                                                {shippingFee === 0 ? '배송비 무료' : '배송비 4,000원'}
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                    
+                                                                    {/* Products for this recipient */}
+                                                                    <div className="space-y-1 ml-2 border-l-2 border-gray-100 pl-3">
+                                                                        {rGroup.map((item) => (
+                                                                            <div key={item.id} className="flex justify-between text-sm">
+                                                                                <span className="text-gray-600">{item.product_type} <span className="text-gray-400">x {item.quantity}</span></span>
+                                                                                <span className="font-medium">{(item.quantity * 40000).toLocaleString()}원</span>
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
                                                                 </div>
-                                                                <div className="text-right">
-                                                                    <p className="font-medium text-gray-700">{(order.quantity * 40000).toLocaleString()}원</p>
-                                                                </div>
-                                                            </div>
-                                                        ))}
-                                                        {shippingFee > 0 && (
-                                                            <div className="flex justify-between items-center pt-2 border-t border-gray-100 text-sm text-gray-600">
-                                                                <span>배송비</span>
-                                                                <span>{shippingFee.toLocaleString()}원</span>
-                                                            </div>
-                                                        )}
+                                                            )
+                                                        })}
+                                                    </div>
+
+                                                    {/* Footer Summary */}
+                                                    <div className="bg-gray-50 px-4 py-3 border-t border-gray-100 flex justify-between items-center text-sm">
+                                                        <span className="text-gray-600">총 결제 금액</span>
+                                                        <span className="text-lg font-bold text-gotgam-orange">{totalGroupAmount.toLocaleString()}원</span>
                                                     </div>
                                                 </div>
                                             )
