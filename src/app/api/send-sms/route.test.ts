@@ -60,11 +60,21 @@ describe('POST /api/send-sms', () => {
 
         expect(res.status).toBe(200)
         expect(json.success).toBe(true)
-        expect(mockSendOne).toHaveBeenCalledTimes(1)
+        expect(mockSendOne).toHaveBeenCalledTimes(2)
+
+        // Check Customer Message
         expect(mockSendOne).toHaveBeenCalledWith(expect.objectContaining({
             to: '01012345678',
             from: '01000000000',
             type: 'LMS'
+        }))
+
+        // Check Seller Message
+        expect(mockSendOne).toHaveBeenCalledWith(expect.objectContaining({
+            to: '01031533822',
+            from: '01000000000',
+            type: 'LMS',
+            subject: expect.stringContaining('[신규주문]')
         }))
     })
 

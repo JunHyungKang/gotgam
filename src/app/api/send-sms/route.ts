@@ -35,16 +35,32 @@ export async function POST(request: Request) {
         // Send Message
         try {
             const messageService = new CoolsmsMessageService(apiKey, apiSecret)
-            const result = await messageService.sendOne({
+
+            // Send to Customer
+            const p1 = messageService.sendOne({
                 to: phone,
                 from: senderPhone,
                 subject: title,
                 text: messageText,
-                type: 'LMS', // Explicitly set to LMS just in case
-                autoTypeDetect: true // Required by SDK type definition
+                type: 'LMS',
+                autoTypeDetect: true
             })
 
-            return NextResponse.json({ success: true, data: result })
+            // Send to Seller (Admin)
+            // User requested to send to 01031533822
+            const sellerPhone = '01031533822'
+            const p2 = messageService.sendOne({
+                to: sellerPhone,
+                from: senderPhone,
+                subject: `[신규주문] ${title}`,
+                text: messageText,
+                type: 'LMS',
+                autoTypeDetect: true
+            })
+
+            const [result, result2] = await Promise.all([p1, p2])
+
+            return NextResponse.json({ success: true, data: { customer: result, seller: result2 } })
         } catch (sdkError: any) {
             console.error('Solapi SDK Error:', sdkError)
             return NextResponse.json(
