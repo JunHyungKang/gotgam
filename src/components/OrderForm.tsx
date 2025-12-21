@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { useRouter } from 'next/navigation'
 import AddressSearchModal from './AddressSearchModal'
-import { PlusIcon, TrashIcon } from '@heroicons/react/24/outline'
+import { PlusIcon, TrashIcon, XMarkIcon } from '@heroicons/react/24/outline'
 
 type Recipient = {
     id: string
@@ -43,6 +43,7 @@ export default function OrderForm() {
     // Address Search State
     const [isSearchOpen, setIsSearchOpen] = useState(false)
     const [searchTargetIndex, setSearchTargetIndex] = useState<number | 'sender'>('sender')
+    const [showConfirmation, setShowConfirmation] = useState(false)
 
     const formatPhoneNumber = (value: string) => {
         const numbers = value.replace(/[^\d]/g, '')
@@ -72,7 +73,7 @@ export default function OrderForm() {
             phone: '',
             baseAddress: '',
             detailAddress: '',
-            quantity30: 0, 
+            quantity30: 0,
             quantity35: 0,
             message: ''
         }])
@@ -132,7 +133,7 @@ export default function OrderForm() {
         const totalQuantity = r.quantity30 + r.quantity35
         // Shipping is free if quantity >= 2 for THIS recipient
         const shippingFee = totalQuantity >= 2 ? 0 : (totalQuantity > 0 ? 4000 : 0)
-        
+
         return { productTotal, shippingFee, total: productTotal + shippingFee }
     }
 
@@ -147,13 +148,12 @@ export default function OrderForm() {
     }, { productTotal: 0, shippingFee: 0, totalAmount: 0, totalQuantity: 0 })
 
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleInitialSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        setLoading(true)
         setMessage('')
 
         const fullSenderAddress = `${senderBaseAddress} ${senderDetailAddress}`.trim()
-        
+
         if (!senderBaseAddress) {
             setMessage('보내는 분 주소를 입력해주세요.')
             setLoading(false)
@@ -175,12 +175,21 @@ export default function OrderForm() {
             }
         }
 
+        // All validations passed, show confirmation modal
+        setShowConfirmation(true)
+    }
+
+    const handleFinalSubmit = async () => {
+        setLoading(true)
+        const totalAmount = totalStats.totalAmount
+
         const groupId = crypto.randomUUID()
         const ordersToInsert = []
-        
+
         for (const r of recipients) {
             const fullReceiverAddress = `${r.baseAddress} ${r.detailAddress}`.trim()
-            
+            const fullSenderAddress = `${senderBaseAddress} ${senderDetailAddress}`.trim()
+
             const commonData = {
                 group_id: groupId,
                 sender_name: senderName,
@@ -204,10 +213,11 @@ export default function OrderForm() {
         try {
             const { error } = await supabase.from('orders').insert(ordersToInsert)
             if (error) throw error
-            router.push(`/success?amount=${totalStats.totalAmount}`)
+            router.push(`/success?amount=${totalAmount}`)
         } catch (error) {
             console.error(error)
             setMessage('주문 접수 중 오류가 발생했습니다. 다시 시도해주세요.')
+            setShowConfirmation(false)
         } finally {
             setLoading(false)
         }
@@ -215,18 +225,99 @@ export default function OrderForm() {
 
     return (
         <section id="order-form" className="py-20 bg-white">
-            <AddressSearchModal 
+            <AddressSearchModal
                 isOpen={isSearchOpen}
                 onClose={() => setIsSearchOpen(false)}
                 onComplete={handleAddressComplete}
             />
-            
+
+            {/* Confirmation Modal */}
+            {showConfirmation && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200">
+                        <div className="p-6 bg-gotgam-brown text-white flex justify-between items-center">
+                            <h3 className="text-xl font-bold">주문 내용 확인</h3>
+                            <button onClick={() => setShowConfirmation(false)} className="text-white/80 hover:text-white transition-colors">
+                                <XMarkIcon className="w-6 h-6" />
+                            </button>
+                        </div>
+
+                        <div className="p-6 max-h-[60vh] overflow-y-auto space-y-6">
+                            <div className="space-y-4">
+                                {recipients.map((r, i) => (
+                                    <div key={r.id} className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                                        <div className="mb-3 border-b border-gray-200 pb-2">
+                                            <div className="flex justify-between items-start">
+                                                <span className="font-bold text-gray-800">받는 분: {r.name}</span>
+                                                <span className="text-xs bg-white border border-gray-200 text-gray-500 px-2 py-1 rounded-md whitespace-nowrap">배송지 {i + 1}</span>
+                                            </div>
+                                            <p className="text-sm text-gray-600 mt-1">{r.baseAddress} {r.detailAddress}</p>
+                                        </div>
+                                        <div className="space-y-1 text-sm text-gray-600">
+                                            {r.quantity30 > 0 && (
+                                                <div className="flex justify-between">
+                                                    <span>프리미엄 선물세트 (30구)</span>
+                                                    <span className="font-bold">{r.quantity30}개</span>
+                                                </div>
+                                            )}
+                                            {r.quantity35 > 0 && (
+                                                <div className="flex justify-between">
+                                                    <span>실속형 (35구)</span>
+                                                    <span className="font-bold">{r.quantity35}개</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="pt-4 border-t border-gray-100 space-y-2">
+                                <div className="flex justify-between text-gray-600">
+                                    <span>총 수량</span>
+                                    <span>{totalStats.totalQuantity}박스</span>
+                                </div>
+                                <div className="flex justify-between text-gray-600">
+                                    <span>상품 금액</span>
+                                    <span>{totalStats.productTotal.toLocaleString()}원</span>
+                                </div>
+                                <div className="flex justify-between text-gray-600">
+                                    <span>배송비</span>
+                                    <span>{totalStats.shippingFee.toLocaleString()}원</span>
+                                </div>
+                                <div className="flex justify-between items-end pt-2 text-xl font-bold text-gotgam-brown">
+                                    <span>총 결제 금액</span>
+                                    <span className="text-gotgam-orange">{totalStats.totalAmount.toLocaleString()}원</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="p-6 bg-gray-50 flex gap-3">
+                            <button
+                                type="button"
+                                onClick={() => setShowConfirmation(false)}
+                                className="flex-1 py-3 px-4 border border-gray-300 rounded-xl text-gray-700 font-bold hover:bg-gray-100 transition-colors"
+                            >
+                                취소
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleFinalSubmit}
+                                disabled={loading}
+                                className="flex-1 py-3 px-4 bg-gotgam-orange text-white rounded-xl font-bold hover:bg-orange-600 transition-colors disabled:opacity-50"
+                            >
+                                {loading ? '처리중...' : '결제하기'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="container mx-auto px-4 max-w-3xl">
                 <h2 className="text-3xl md:text-4xl font-bold text-center text-gotgam-brown mb-12">
                     주문하기
                 </h2>
 
-                <form onSubmit={handleSubmit} className="space-y-8">
+                <form onSubmit={handleInitialSubmit} className="space-y-8">
                     {/* Sender Info */}
                     <div className="bg-gotgam-cream/30 p-6 md:p-8 rounded-2xl space-y-6">
                         <h3 className="text-2xl font-bold text-gotgam-brown mb-4 border-b border-gotgam-brown/10 pb-4">보내는 분</h3>
@@ -260,7 +351,7 @@ export default function OrderForm() {
                                 />
                             </div>
                         </div>
-                        
+
                         {/* Sender Address */}
                         <div className="space-y-2">
                             <label className="block text-sm font-medium text-gray-700">
@@ -300,7 +391,7 @@ export default function OrderForm() {
                                 <div className="bg-gray-50 px-6 py-4 flex justify-between items-center border-b border-gray-100">
                                     <h3 className="text-lg font-bold text-gray-800">배송지 {index + 1}</h3>
                                     {recipients.length > 1 && (
-                                        <button 
+                                        <button
                                             type="button"
                                             onClick={() => handleRemoveRecipient(index)}
                                             className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50 transition-colors"
@@ -311,7 +402,7 @@ export default function OrderForm() {
                                     )}
                                 </div>
                                 <div className="p-6 md:p-8 space-y-6">
-                                    
+
                                     {/* Same as sender option */}
                                     <div className="flex justify-end">
                                         <label className="flex items-center space-x-2 cursor-pointer select-none">
@@ -394,7 +485,7 @@ export default function OrderForm() {
                                                     <button type="button" onClick={() => handleRecipientChange(index, 'quantity30', recipient.quantity30 + 1)} className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gotgam-orange font-bold text-xl">+</button>
                                                 </div>
                                             </div>
-                                            
+
                                             {/* 35구 */}
                                             <div className="flex justify-between items-center">
                                                 <div>
@@ -413,7 +504,7 @@ export default function OrderForm() {
                                         <div className="pt-2">
                                             <input
                                                 type="text"
-                                                placeholder="배송 메시지 (선택)"
+                                                placeholder="배송 희망일(최대한 맞춰드립니다) / 포장용 보자기가 필요하면 동봉해드립니다"
                                                 value={recipient.message}
                                                 onChange={(e) => handleRecipientChange(index, 'message', e.target.value)}
                                                 className="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-gotgam-orange outline-none"
@@ -458,7 +549,7 @@ export default function OrderForm() {
                                     </p>
                                 </div>
                             </div>
-                            
+
                             {message && (
                                 <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm text-center">
                                     {message}

@@ -4,8 +4,8 @@ import ProductSection from './ProductSection'
 describe('ProductSection Component', () => {
     it('renders product options', () => {
         render(<ProductSection />)
-        expect(screen.getByText('30구 (대과)')).toBeInTheDocument()
-        expect(screen.getByText('35구 (실속형)')).toBeInTheDocument() // Adjusted text for 35 count
+        expect(screen.getByText('프리미엄 선물세트 (30구)')).toBeInTheDocument()
+        expect(screen.getByText('실속형 (35구)')).toBeInTheDocument()
     })
 
     it('renders prices', () => {
@@ -14,9 +14,9 @@ describe('ProductSection Component', () => {
         expect(prices).toHaveLength(2)
     })
 
-    it('renders packaging info', () => {
+    it('does not render packaging info', () => {
         render(<ProductSection />)
-        const packagingInfos = screen.getAllByText(/고급 보자기 포장/i)
-        expect(packagingInfos).toHaveLength(2)
+        const packagingInfos = screen.queryAllByText(/고급 보자기 포장/i)
+        expect(packagingInfos).toHaveLength(0)
     })
 })

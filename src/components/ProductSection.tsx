@@ -16,7 +16,7 @@ export default function ProductSection() {
                     <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow border border-gotgam-cream">
                         <div className="relative h-64 w-full">
                             <Image
-                                src="/images/uploaded_image_0_1765804097961.jpg"
+                                src="/images/uploaded_image_1_1765804097961.jpg"
                                 alt="30구 곶감 선물세트"
                                 fill
                                 className="object-cover"
@@ -31,9 +31,6 @@ export default function ProductSection() {
                                 <span className="text-2xl font-bold text-gotgam-orange">
                                     40,000원
                                 </span>
-                                <span className="text-sm bg-gotgam-gold/10 text-gotgam-gold px-3 py-1 rounded-full font-medium">
-                                    고급 보자기 포장 포함
-                                </span>
                             </div>
                         </div>
                     </div>
@@ -42,7 +39,7 @@ export default function ProductSection() {
                     <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow border border-gotgam-cream">
                         <div className="relative h-64 w-full">
                             <Image
-                                src="/images/uploaded_image_1_1765804097961.jpg"
+                                src="/images/uploaded_image_0_1765804097961.jpg"
                                 alt="35구 곶감 선물세트"
                                 fill
                                 className="object-cover"
@@ -56,9 +53,6 @@ export default function ProductSection() {
                             <div className="flex justify-between items-center border-t border-gray-100 pt-4">
                                 <span className="text-2xl font-bold text-gotgam-orange">
                                     40,000원
-                                </span>
-                                <span className="text-sm bg-gotgam-gold/10 text-gotgam-gold px-3 py-1 rounded-full font-medium">
-                                    고급 보자기 포장 포함
                                 </span>
                             </div>
                         </div>
