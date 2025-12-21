@@ -213,6 +213,28 @@ export default function OrderForm() {
         try {
             const { error } = await supabase.from('orders').insert(ordersToInsert)
             if (error) throw error
+
+            // Send SMS Notification (Fire and Forget)
+            const orderDetailsStr = recipients.map((r, i) => {
+                const items = []
+                if (r.quantity30 > 0) items.push(`- 프리미엄 선물세트(30구): ${r.quantity30}개`)
+                if (r.quantity35 > 0) items.push(`- 실속형(35구): ${r.quantity35}개`)
+                return `[배송지 ${i + 1}: ${r.name}]\n${items.join('\n')}\n주소: ${r.baseAddress} ${r.detailAddress}`
+            }).join('\n\n')
+
+            fetch('/api/send-sms', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    phone: senderPhone, // Notify the sender (buyer)
+                    name: senderName,
+                    orderDetails: orderDetailsStr,
+                    totalAmount: totalAmount
+                }),
+            }).catch(err => console.error('SMS sending failed:', err))
+
             router.push(`/success?amount=${totalAmount}`)
         } catch (error) {
             console.error(error)
