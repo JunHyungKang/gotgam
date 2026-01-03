@@ -42,3 +42,19 @@ npm run dev
 ```
 
 3. 브라우저에서 `http://localhost:3000` 접속
+
+## Supabase 자동화 관리 (Supabase Automation)
+
+프로젝트가 장기간 활동이 없어 Paused 상태가 되는 것을 방지하기 위해, GitHub Actions를 통한 자동화 스크립트가 설정되어 있습니다.
+
+- **스크립트 위치**: `scripts/keep_alive.js`
+- **워크플로우**: `.github/workflows/cron_keep_alive.yml` (매주 월요일 00:00 UTC 실행)
+
+### 설정 방법 (GitHub Secrets)
+이 기능이 정상 작동하려면 GitHub Repository의 Secrets 설정이 필요합니다.
+
+1. GitHub 저장소 > **Settings** > **Secrets and variables** > **Actions**
+2. **New repository secret** 클릭
+3. 아래 두 가지 환경 변수 등록:
+   - `NEXT_PUBLIC_SUPABASE_URL`: Supabase 프로젝트 URL
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Supabase Anon Key
