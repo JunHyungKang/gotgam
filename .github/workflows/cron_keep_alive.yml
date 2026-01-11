@@ -2,8 +2,9 @@ name: Supabase Keep Alive
 
 on:
   schedule:
-    # Run at 00:00 on Monday (UTC)
-    - cron: '0 0 * * 1'
+    # Run every 5 days to prevent Supabase from pausing (7-day inactivity limit)
+    # Runs at 00:00 UTC on Monday and Saturday
+    - cron: '0 0 * * 1,6'
   workflow_dispatch:
 
 jobs:
